@@ -6,6 +6,9 @@ import (
 	"gocommerce/internal/usecase"
 	"gocommerce/internal/utils"
 	"net/http"
+	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 type CategoryHandler struct {
@@ -41,4 +44,19 @@ func (h *CategoryHandler) GetCategories(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	utils.JSONResponse(w, http.StatusOK, categories)
+}
+
+func (h *CategoryHandler) GetCategoryByID(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	strId, err := strconv.Atoi(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	category, err := h.usecase.GetCategoryByID(r.Context(), strId)
+	if err != nil {
+		utils.JSONResponse(w, http.StatusNotFound, map[string]interface{}{"message": "Category not found!"})
+		return
+	}
+	utils.JSONResponse(w, http.StatusOK, category)
 }
