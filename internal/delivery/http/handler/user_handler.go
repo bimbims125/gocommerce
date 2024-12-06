@@ -6,6 +6,9 @@ import (
 	"gocommerce/internal/usecase"
 	"gocommerce/internal/utils"
 	"net/http"
+	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 type UserHandler struct {
@@ -40,4 +43,19 @@ func (h *UserHandler) GetUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	utils.JSONResponse(w, http.StatusOK, users)
+}
+
+func (h *UserHandler) GetUserByID(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	strId, err := strconv.Atoi(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	user, err := h.usecase.GetUserByID(r.Context(), strId)
+	if err != nil {
+		utils.JSONResponse(w, http.StatusNotFound, map[string]interface{}{"message": "User not found!"})
+		return
+	}
+	utils.JSONResponse(w, http.StatusOK, user)
 }
