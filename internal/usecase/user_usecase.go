@@ -13,6 +13,7 @@ type UserUseCase struct {
 type UserRepository interface {
 	Create(ctx context.Context, user *entity.User) (int, error)
 	GetUsers(ctx context.Context) ([]entity.User, error)
+	GetUserByID(ctx context.Context, id int) (*entity.User, error)
 }
 
 func NewUserUseCase(repo UserRepository) *UserUseCase {
@@ -33,4 +34,8 @@ func (u *UserUseCase) Create(ctx context.Context, user *entity.User) (int, error
 
 func (u *UserUseCase) GetUsers(ctx context.Context) ([]entity.User, error) {
 	return u.repo.GetUsers(ctx)
+}
+
+func (u *UserUseCase) GetUserByID(ctx context.Context, id int) (*entity.User, error) {
+	return u.repo.GetUserByID(ctx, id)
 }
