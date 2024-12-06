@@ -14,4 +14,5 @@ func RegisterCategoryRoutes(router *mux.Router, uc *usecase.CategoryUseCase) {
 
 	router.HandleFunc("/categories", categoryHandler.CreateCategory).Methods("POST")
 	router.HandleFunc("/categories", categoryHandler.GetCategories).Methods("GET")
+	router.HandleFunc("/categories/{id}", categoryHandler.GetCategoryByID).Methods("GET")
 }

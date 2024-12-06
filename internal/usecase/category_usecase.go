@@ -12,6 +12,7 @@ type CategoryUseCase struct {
 type CategoryRepository interface {
 	CreateCategory(ctx context.Context, category *entity.Category) (int, error)
 	GetCategories(ctx context.Context) ([]entity.Category, error)
+	GetCategoryByID(ctx context.Context, id int) (*entity.Category, error)
 }
 
 func NewCategoryUseCase(repo CategoryRepository) *CategoryUseCase {
@@ -19,13 +20,17 @@ func NewCategoryUseCase(repo CategoryRepository) *CategoryUseCase {
 		repo: repo,
 	}
 }
-func (c *CategoryUseCase) CreateCategory(ctx context.Context, category *entity.Category) (int, error) {
+func (u *CategoryUseCase) CreateCategory(ctx context.Context, category *entity.Category) (int, error) {
 	if err := category.Validate(); err != nil {
 		return 0, err
 	}
-	return c.repo.CreateCategory(ctx, category)
+	return u.repo.CreateCategory(ctx, category)
 }
 
-func (c *CategoryUseCase) GetCategories(ctx context.Context) ([]entity.Category, error) {
-	return c.repo.GetCategories(ctx)
+func (u *CategoryUseCase) GetCategories(ctx context.Context) ([]entity.Category, error) {
+	return u.repo.GetCategories(ctx)
+}
+
+func (u *CategoryUseCase) GetCategoryByID(ctx context.Context, id int) (*entity.Category, error) {
+	return u.repo.GetCategoryByID(ctx, id)
 }
