@@ -12,18 +12,22 @@ import (
 
 var DB *sql.DB
 
-func init() {
+func InitDB() {
 	// Load .env file
-	err := godotenv.Load()
+	err := godotenv.Load("../../.env")
 	if err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
 
 	// Get environment variables
 	host := os.Getenv("DB_HOST")
+	log.Println(host)
 	port := os.Getenv("DB_PORT")
+	log.Println(port)
 	user := os.Getenv("DB_USER")
+	log.Println(user)
 	password := os.Getenv("DB_PASSWORD")
+	log.Println(password)
 	dbname := os.Getenv("DB_NAME")
 
 	// Create connection string
