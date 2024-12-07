@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/imagekit-developer/imagekit-go/api/uploader"
 )
@@ -33,4 +34,16 @@ func UploadImageImageKit(file string) string {
 		log.Fatal(err)
 	}
 	return ik.Data.Url
+}
+
+// ValidateImageExt checks if the file has a valid image extension
+func ValidateImageExt(filename string) bool {
+	allowedExts := []string{".jpg", ".jpeg", ".png"}
+	fileExt := strings.ToLower(filename[strings.LastIndex(filename, "."):])
+	for _, ext := range allowedExts {
+		if fileExt == ext {
+			return true
+		}
+	}
+	return false
 }
