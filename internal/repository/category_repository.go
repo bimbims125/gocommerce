@@ -45,7 +45,7 @@ func (r *CategoryRepository) GetCategories(ctx context.Context) ([]entity.Catego
 func (r *CategoryRepository) GetCategoryByID(ctx context.Context, id int) (*entity.Category, error) {
 	query := "SELECT id, name FROM categories WHERE id = $1"
 	var category entity.Category
-	err := r.db.QueryRowContext(ctx, query, 1).Scan(&category.ID, &category.Name)
+	err := r.db.QueryRowContext(ctx, query, id).Scan(&category.ID, &category.Name)
 	if err != nil {
 		return nil, err
 	}
