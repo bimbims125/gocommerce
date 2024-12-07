@@ -11,6 +11,8 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 type ProductHandler struct {
@@ -82,6 +84,7 @@ func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 
 	// Upload to ImageKit
 	imageURL := utils.UploadImageImageKit(filepath)
+	// End Upload to ImageKit
 
 	product := entity.Product{
 		Name:       name,
@@ -100,5 +103,28 @@ func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	utils.JSONResponse(w, http.StatusCreated, map[string]interface{}{
 		"id": id,
 	})
+}
 
+func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
+	products, err := h.usecase.GetProducts(r.Context())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	utils.JSONResponse(w, http.StatusOK, products)
+}
+
+func (h *ProductHandler) GetProductByID(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	strId, err := strconv.Atoi(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	product, err := h.usecase.GetProductByID(r.Context(), strId)
+	if err != nil {
+		utils.JSONResponse(w, http.StatusNotFound, map[string]interface{}{"message": "Product not found!"})
+		return
+	}
+	utils.JSONResponse(w, http.StatusOK, product)
 }
