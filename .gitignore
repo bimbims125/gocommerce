@@ -5,3 +5,7 @@ nyoba/
 *.jpg
 *.jpeg
 *.png
+
+midtrans_repository.go
+midtrans_usecase.go
+midtrans_entity.go
