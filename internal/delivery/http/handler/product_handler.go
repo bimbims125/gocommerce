@@ -38,29 +38,35 @@ func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 
 	floatPrice, err := strconv.ParseFloat(price, 64)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		utils.JSONResponse(w, http.StatusBadRequest, map[string]interface{}{"message": "Invalid price format"})
 		return
 	}
 
 	stringCategoryID, err := strconv.Atoi(categoryID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		utils.JSONResponse(w, http.StatusBadRequest, map[string]interface{}{"message": "Invalid category ID format"})
 		return
 	}
 
 	intStock, err := strconv.Atoi(stock)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		utils.JSONResponse(w, http.StatusBadRequest, map[string]interface{}{"message": "Invalid stock format"})
 		return
 	}
 	// Get the uploaded file from the form
+
 	file, handler, err := r.FormFile("image")
 	if err != nil {
 		log.Println("Error retrieving file:", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	defer file.Close()
+
+	// validate image extension/format
+	if !utils.ValidateImageExt(handler.Filename) {
+		utils.JSONResponse(w, http.StatusBadRequest, map[string]interface{}{"message": "Invalid image format. only jpg, jpeg, png"})
+		return
+	}
 
 	// Generate a unique filename for the image
 	uniqueFilename := fmt.Sprintf("%d-%s", time.Now().Unix(), handler.Filename)
