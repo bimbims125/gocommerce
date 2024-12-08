@@ -7,14 +7,4 @@ nyoba/
 *.jpeg
 *.png
 
-<<<<<<< HEAD
-midtrans_entity.go
-midtrans_repository.go
-midtrans_usecase.go
-
 READMEpram.md
-=======
-midtrans_repository.go
-midtrans_usecase.go
-midtrans_entity.go
->>>>>>> 1e30d83647999c7f4d2b8dc0764c3225bfac167d
