@@ -26,6 +26,11 @@ func InitDB() {
 	password := os.Getenv("DB_PASSWORD")
 	dbname := os.Getenv("DB_NAME")
 
+	// Ensure all environment variables are set
+	if host == "" || port == "" || user == "" || password == "" || dbname == "" {
+		log.Fatal("One or more database environment variables are not set")
+	}
+
 	// Create connection string
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
@@ -43,4 +48,16 @@ func InitDB() {
 	}
 
 	log.Println("Database connected successfully!")
+}
+
+// CloseDB closes the database connection (called on shutdown or cleanup)
+func CloseDB() {
+	if DB != nil {
+		err := DB.Close()
+		if err != nil {
+			log.Printf("Error closing database connection: %v", err)
+		} else {
+			log.Println("Database connection closed successfully")
+		}
+	}
 }
