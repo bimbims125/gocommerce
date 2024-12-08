@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"gocommerce/internal/entity"
 	"gocommerce/internal/usecase"
 	"io"
@@ -48,5 +49,5 @@ func (h *MidtransHandler) PaymentCallbackHandler(w http.ResponseWriter, r *http.
 		// utils.WriteError(w, http.StatusInternalServerError, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	return
+	fmt.Println(callbackResponse)
 }

@@ -58,7 +58,7 @@ func createCustomerAddress(order entity.GetOrder) *midtrans.CustomerAddress {
 	}
 }
 func createSnapRequest(order entity.GetOrder, request entity.MidtransRequest, custAddress *midtrans.CustomerAddress) *snap.Request {
-	orderId := fmt.Sprintf("MIDTRANS%d%s%d", order.Product.ID, request.ItemID, time.Now().UnixNano())
+	orderId := fmt.Sprintf("MIDTRANS%d%d", request.ItemID, time.Now().UnixNano())
 	fmt.Println("Amount :", request.Amount)
 	return &snap.Request{
 		TransactionDetails: midtrans.TransactionDetails{
@@ -74,6 +74,10 @@ func createSnapRequest(order entity.GetOrder, request entity.MidtransRequest, cu
 			Phone:    "083819588819",
 			BillAddr: custAddress,
 			ShipAddr: custAddress,
+		},
+		Expiry: &snap.ExpiryDetails{
+			Unit:     "minute",
+			Duration: 1,
 		},
 		EnabledPayments: snap.AllSnapPaymentType,
 		Items: &[]midtrans.ItemDetails{
