@@ -12,6 +12,7 @@ type OrderUsecase struct {
 type OrderRepository interface {
 	CreateOrder(ctx context.Context, order *entity.Order) (int, error)
 	GetOrders(ctx context.Context) ([]entity.GetOrder, error)
+	UpdateOrderPaymentStatus(ctx context.Context, transactionID string, paymentStatus string) error
 }
 
 func NewOrderUsecase(repo OrderRepository) *OrderUsecase {
@@ -24,4 +25,8 @@ func (u *OrderUsecase) CreateOrder(ctx context.Context, order *entity.Order) (in
 
 func (u *OrderUsecase) GetOrders(ctx context.Context) ([]entity.GetOrder, error) {
 	return u.repo.GetOrders(ctx)
+}
+
+func (u *OrderUsecase) UpdateOrderPaymentStatus(ctx context.Context, transactionID string, paymentStatus string) error {
+	return u.repo.UpdateOrderPaymentStatus(ctx, transactionID, paymentStatus)
 }

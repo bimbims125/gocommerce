@@ -18,6 +18,7 @@ func main() {
 	config.InitImageKitConfig()
 	infra.InitDB()
 	defer infra.DB.Close()
+
 	userRepo := repository.NewUserRepository(infra.DB)
 	UserUseCase := usecase.NewUserUseCase(userRepo)
 
@@ -37,6 +38,7 @@ func main() {
 	routes.RegisterCategoryRoutes(subRouter, CategoryUseCase)
 	routes.RegisterProductRoutes(subRouter, ProductUseCase)
 	routes.RegisterOrderRoutes(subRouter, orderUseCase, usecase.NewMidtransUsecase(v), UserUseCase, ProductUseCase)
+	routes.RegisterMidtransRoutes(subRouter, usecase.NewMidtransUsecase(v), orderUseCase)
 
 	log.Println("Server is running on port 3300")
 	http.ListenAndServe(":3300", subRouter)

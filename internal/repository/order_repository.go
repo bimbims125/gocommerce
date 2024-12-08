@@ -59,3 +59,12 @@ func (r *OrderRepository) GetOrders(ctx context.Context) ([]entity.GetOrder, err
 	}
 	return orders, nil
 }
+
+func (r *OrderRepository) UpdateOrderPaymentStatus(ctx context.Context, transactionID string, paymentStatus string) error {
+	query := "UPDATE orders SET payment_status = $1 WHERE transaction_id = $2"
+	_, err := r.db.ExecContext(ctx, query, paymentStatus, transactionID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
