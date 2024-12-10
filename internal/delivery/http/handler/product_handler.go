@@ -74,7 +74,7 @@ func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	filepath := fmt.Sprintf("../internal/static/images/%s", uniqueFilename)
 
 	// Respond immediately to the client
-	utils.JSONResponse(w, http.StatusAccepted, map[string]interface{}{"message": "File upload in progress"})
+	utils.JSONResponse(w, http.StatusCreated, map[string]interface{}{"message": "Success"})
 
 	// Process file upload and product creation asynchronously
 	go func() {
