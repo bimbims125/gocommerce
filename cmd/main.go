@@ -31,6 +31,9 @@ func main() {
 	orderRepo := repository.NewOrderRepository(infra.DB)
 	orderUseCase := usecase.NewOrderUsecase(orderRepo)
 
+	cartRepo := repository.NewCartRepository(infra.DB)
+	cartUseCase := usecase.NewCartUsecase(*cartRepo)
+
 	// Setup routes and start the server
 	router := mux.NewRouter()
 	subRouter := router.PathPrefix("/api/v1").Subrouter()
@@ -39,6 +42,7 @@ func main() {
 	routes.RegisterProductRoutes(subRouter, ProductUseCase, UserUseCase)
 	routes.RegisterOrderRoutes(subRouter, orderUseCase, usecase.NewMidtransUsecase(v), UserUseCase, ProductUseCase)
 	routes.RegisterMidtransRoutes(subRouter, usecase.NewMidtransUsecase(v), orderUseCase)
+	routes.RegisterCartRoutes(subRouter, cartUseCase)
 
 	log.Println("Server is running on port 3300")
 	http.ListenAndServe(":3300", subRouter)
