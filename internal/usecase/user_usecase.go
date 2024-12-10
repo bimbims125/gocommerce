@@ -14,6 +14,7 @@ type UserRepository interface {
 	Create(ctx context.Context, user *entity.User) (int, error)
 	GetUsers(ctx context.Context) ([]entity.User, error)
 	GetUserByID(ctx context.Context, id int) (*entity.User, error)
+	GetUserByEmail(ctx context.Context, email string) (*entity.User, error)
 }
 
 func NewUserUseCase(repo UserRepository) *UserUseCase {
@@ -38,4 +39,8 @@ func (u *UserUseCase) GetUsers(ctx context.Context) ([]entity.User, error) {
 
 func (u *UserUseCase) GetUserByID(ctx context.Context, id int) (*entity.User, error) {
 	return u.repo.GetUserByID(ctx, id)
+}
+
+func (u *UserUseCase) GetUserByEmail(ctx context.Context, email string) (*entity.User, error) {
+	return u.repo.GetUserByEmail(ctx, email)
 }

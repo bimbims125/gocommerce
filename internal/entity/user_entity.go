@@ -11,6 +11,7 @@ type User struct {
 	Name     string
 	Email    string
 	Password string
+	Role     string
 }
 
 type GetUser struct {
