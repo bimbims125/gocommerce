@@ -19,7 +19,7 @@ func JSONResponse(w http.ResponseWriter, status int, data interface{}) error {
 	return json.NewEncoder(w).Encode(data)
 }
 
-func UploadImageImageKit(file string) string {
+func UploadImageImageKit(file string) (string, error) {
 	imageBytes, err := os.ReadFile(file)
 	if err != nil {
 		log.Fatalf("Error reading file: %v", err)
@@ -33,7 +33,7 @@ func UploadImageImageKit(file string) string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	return ik.Data.Url
+	return ik.Data.Url, err
 }
 
 // ValidateImageExt checks if the file has a valid image extension

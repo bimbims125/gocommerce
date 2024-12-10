@@ -52,7 +52,7 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !utils.ComparePasswords(user.Password, []byte(payload.Password)) {
-		utils.JSONResponse(w, http.StatusUnauthorized, map[string]interface{}{"message": "Invalid password!"})
+		utils.JSONResponse(w, http.StatusUnauthorized, map[string]interface{}{"message": "Invalid email or password!"})
 		return
 	}
 

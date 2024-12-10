@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"fmt"
 	"gocommerce/internal/entity"
 	"gocommerce/internal/usecase"
@@ -24,13 +25,13 @@ func NewProductHandler(usecase *usecase.ProductUseCase) *ProductHandler {
 }
 
 func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
-	// Parse the form and handle any errors
-	err := r.ParseMultipartForm(10 << 20) // Limit file size to 10MB
-	if err != nil {
-		log.Println("Error parsing form:", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	// Parse the form data
+	if err := r.ParseMultipartForm(10 << 20); err != nil {
+		utils.JSONResponse(w, http.StatusBadRequest, map[string]interface{}{"message": "Error parsing form: " + err.Error()})
 		return
 	}
+
+	// Extract and validate form data
 	name := r.FormValue("name")
 	price := r.FormValue("price")
 	categoryID := r.FormValue("category_id")
@@ -42,7 +43,7 @@ func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	stringCategoryID, err := strconv.Atoi(categoryID)
+	intCategoryID, err := strconv.Atoi(categoryID)
 	if err != nil {
 		utils.JSONResponse(w, http.StatusBadRequest, map[string]interface{}{"message": "Invalid category ID format"})
 		return
@@ -53,62 +54,68 @@ func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		utils.JSONResponse(w, http.StatusBadRequest, map[string]interface{}{"message": "Invalid stock format"})
 		return
 	}
-	// Get the uploaded file from the form
 
+	// Retrieve the uploaded file
 	file, handler, err := r.FormFile("image")
 	if err != nil {
-		log.Println("Error retrieving file:", err)
+		utils.JSONResponse(w, http.StatusBadRequest, map[string]interface{}{"message": "Error retrieving file: " + err.Error()})
 		return
 	}
 	defer file.Close()
 
-	// validate image extension/format
+	// Validate image format
 	if !utils.ValidateImageExt(handler.Filename) {
-		utils.JSONResponse(w, http.StatusBadRequest, map[string]interface{}{"message": "Invalid image format. only jpg, jpeg, png"})
+		utils.JSONResponse(w, http.StatusBadRequest, map[string]interface{}{"message": "Invalid image format. Only jpg, jpeg, png allowed"})
 		return
 	}
 
-	// Generate a unique filename for the image
+	// Generate a unique filename
 	uniqueFilename := fmt.Sprintf("%d-%s", time.Now().Unix(), handler.Filename)
 	filepath := fmt.Sprintf("../internal/static/images/%s", uniqueFilename)
 
-	// Create the destination file
-	dst, err := os.Create(filepath)
-	if err != nil {
-		log.Println("Error creating file:", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer dst.Close()
+	// Respond immediately to the client
+	utils.JSONResponse(w, http.StatusAccepted, map[string]interface{}{"message": "File upload in progress"})
 
-	// Copy the uploaded file to the destination
-	if _, err := io.Copy(dst, file); err != nil {
-		log.Println("Error writing file:", err)
-		http.Error(w, "Error writing file: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
+	// Process file upload and product creation asynchronously
+	go func() {
+		// Save the file to the server
+		dst, err := os.Create(filepath)
+		if err != nil {
+			log.Printf("Error creating file: %v", err)
+			return
+		}
+		defer dst.Close()
 
-	// Upload to ImageKit
-	imageURL := utils.UploadImageImageKit(filepath)
-	// End Upload to ImageKit
+		if _, err := io.Copy(dst, file); err != nil {
+			log.Printf("Error saving file: %v", err)
+			return
+		}
 
-	product := entity.Product{
-		Name:       name,
-		Price:      floatPrice,
-		CategoryID: stringCategoryID,
-		Stock:      intStock,
-		ImageURL:   imageURL,
-	}
+		// Optionally upload the file to a cloud service
+		imageURL, err := utils.UploadImageImageKit(filepath)
+		if err != nil {
+			log.Printf("Error uploading to ImageKit: %v", err)
+			return
+		}
 
-	id, err := h.usecase.CreateProduct(r.Context(), &product)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+		// Create the product entity
+		product := entity.Product{
+			Name:       name,
+			Price:      floatPrice,
+			CategoryID: intCategoryID,
+			Stock:      intStock,
+			ImageURL:   imageURL,
+		}
 
-	utils.JSONResponse(w, http.StatusCreated, map[string]interface{}{
-		"id": id,
-	})
+		// Save the product in the database
+		_, err = h.usecase.CreateProduct(context.Background(), &product)
+		if err != nil {
+			log.Printf("Error saving product: %v", err)
+			return
+		}
+
+		log.Printf("Product created successfully with image: %s", imageURL)
+	}()
 }
 
 func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
