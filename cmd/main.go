@@ -36,7 +36,7 @@ func main() {
 	subRouter := router.PathPrefix("/api/v1").Subrouter()
 	routes.RegisterUserRoutes(subRouter, UserUseCase)
 	routes.RegisterCategoryRoutes(subRouter, CategoryUseCase)
-	routes.RegisterProductRoutes(subRouter, ProductUseCase)
+	routes.RegisterProductRoutes(subRouter, ProductUseCase, UserUseCase)
 	routes.RegisterOrderRoutes(subRouter, orderUseCase, usecase.NewMidtransUsecase(v), UserUseCase, ProductUseCase)
 	routes.RegisterMidtransRoutes(subRouter, usecase.NewMidtransUsecase(v), orderUseCase)
 
