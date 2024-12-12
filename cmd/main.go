@@ -14,8 +14,13 @@ import (
 )
 
 func main() {
+	// Validator
 	v := validator.New()
+
+	// Init imagekit config
 	config.InitImageKitConfig()
+
+	// init database
 	infra.InitDB()
 	defer infra.DB.Close()
 

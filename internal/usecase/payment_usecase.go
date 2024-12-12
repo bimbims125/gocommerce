@@ -79,7 +79,11 @@ func createSnapRequest(order entity.GetOrder, request entity.MidtransRequest, cu
 			Unit:     "minute",
 			Duration: 1,
 		},
-		EnabledPayments: snap.AllSnapPaymentType,
+		EnabledPayments: []snap.SnapPaymentType{
+			snap.PaymentTypeShopeepay,
+			snap.PaymentTypeBCAVA,
+			snap.PaymentTypeGopay,
+		},
 		Items: &[]midtrans.ItemDetails{
 			{
 				ID:    orderId,
